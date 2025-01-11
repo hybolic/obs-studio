@@ -46,8 +46,6 @@ OBSAdvAudioCtrl::OBSAdvAudioCtrl(QGridLayout *, obs_source_t *source_) : source(
 		monitoringType = new QComboBox();
 	syncOffset = new QSpinBox();
 
-	//new_mixers = new std::list<QPointer<QCheckBox>>();
-	//new_mixers.begin();
 	for (unsigned char i = 0; i < MAX_AUDIO_MIXES; i++)
 	{
 		QPointer<QCheckBox> mixer = new QCheckBox();
