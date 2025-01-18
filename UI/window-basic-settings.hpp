@@ -46,6 +46,28 @@ class OBSHotkeyWidget;
 #define VOLUME_METER_DECAY_MEDIUM 11.76
 #define VOLUME_METER_DECAY_SLOW 8.57
 
+/* clang-format off */
+#define COMBO_CHANGED   &QComboBox::currentIndexChanged
+#define EDIT_CHANGED    &QLineEdit::textChanged
+#define CBEDIT_CHANGED  &QComboBox::editTextChanged
+#define CHECK_CHANGED   &QCheckBox::toggled
+#define GROUP_CHANGED   &QGroupBox::toggled
+#define SCROLL_CHANGED  &QSpinBox::valueChanged
+#define DSCROLL_CHANGED &QDoubleSpinBox::valueChanged
+#define TEXT_CHANGED    &QPlainTextEdit::textChanged
+
+#define GENERAL_CHANGED &OBSBasicSettings::GeneralChanged
+#define STREAM1_CHANGED &OBSBasicSettings::Stream1Changed
+#define OUTPUTS_CHANGED &OBSBasicSettings::OutputsChanged
+#define AUDIO_RESTART   &OBSBasicSettings::AudioChangedRestart
+#define AUDIO_CHANGED   &OBSBasicSettings::AudioChanged
+#define VIDEO_RES       &OBSBasicSettings::VideoChangedResolution
+#define VIDEO_CHANGED   &OBSBasicSettings::VideoChanged
+#define A11Y_CHANGED    &OBSBasicSettings::A11yChanged
+#define APPEAR_CHANGED  &OBSBasicSettings::AppearanceChanged
+#define ADV_CHANGED     &OBSBasicSettings::AdvancedChanged
+#define ADV_RESTART     &OBSBasicSettings::AdvancedChangedRestart
+/* clang-format on */
 class SilentUpdateCheckBox : public QCheckBox {
 	Q_OBJECT
 
@@ -197,13 +219,12 @@ private:
 	}
 
 	template<typename Widget, typename WidgetParent, typename... SignalArgs, typename... SlotArgs>
-	void HookWidget(Widget *widget, void (WidgetParent::*signal)(SignalArgs...),
-			void (OBSBasicSettings::*slot)(SlotArgs...))
+	void HookWidget(Widget *widget, void (WidgetParent::*signal)(SignalArgs...), void (OBSBasicSettings::*slot)(SlotArgs...))
 	{
 		QObject::connect(widget, signal, this, slot);
 		widget->setProperty("changed", QVariant(false));
 	}
-
+private:
 	bool QueryChanges();
 	bool QueryAllowedToClose();
 
@@ -435,12 +456,12 @@ private slots:
 	void VideoChanged();
 	void VideoChangedResolution();
 	void HotkeysChanged();
-	bool ScanDuplicateHotkeys(QFormLayout *layout);
-	void ReloadHotkeys(obs_hotkey_id ignoreKey = OBS_INVALID_HOTKEY_ID);
 	void A11yChanged();
 	void AppearanceChanged();
 	void AdvancedChanged();
 	void AdvancedChangedRestart();
+	bool ScanDuplicateHotkeys(QFormLayout *layout);
+	void ReloadHotkeys(obs_hotkey_id ignoreKey = OBS_INVALID_HOTKEY_ID);
 
 	void UpdateStreamDelayEstimate();
 
@@ -455,6 +476,7 @@ private slots:
 	void SimpleRecordingQualityLosslessWarning(int idx);
 
 	void SimpleReplayBufferChanged();
+	void ChangeAudioChannels();
 	void AdvReplayBufferChanged();
 
 	void SimpleStreamingEncoderChanged();
@@ -485,5 +507,10 @@ public:
 	OBSBasicSettings(QWidget *parent);
 	~OBSBasicSettings();
 
+	template<typename Widget, typename WidgetParent, typename... SignalArgs, typename... SlotArgs>
+	void ReHookWidget(Widget *widget, void (WidgetParent::*signal)(SignalArgs...), void (OBSBasicSettings::*slot)(SlotArgs...))
+	{
+		HookWidget(widget, signal, slots);
+	}
 	inline const QIcon &GetHotkeyConflictIcon() const { return hotkeyConflictIcon; }
 };
