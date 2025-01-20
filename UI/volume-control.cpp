@@ -37,7 +37,7 @@ static inline Qt::CheckState GetCheckState(bool muted, bool unassigned)
 
 static inline bool IsSourceUnassigned(obs_source_t *source)
 {
-	uint32_t mixes = (obs_source_get_audio_mixers(source) & ((1 << MAX_AUDIO_MIXES) - 1));
+	uint32_t mixes = (obs_source_get_audio_mixers(source) & ((1 << MODULAR_AUDIO_SOURCES_COUNT) - 1));
 	obs_monitoring_type mt = obs_source_get_monitoring_type(source);
 
 	return mixes == 0 && mt != OBS_MONITORING_TYPE_MONITOR_ONLY;

@@ -621,7 +621,7 @@ void SimpleOutput::LoadRecordingPreset()
 		if (!success)
 			throw "Failed to create audio recording encoder "
 			      "(simple output)";
-		for (int i = 0; i < MAX_AUDIO_MIXES; i++) {
+		for (int i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 			char name[23];
 			if (strcmp(audio_encoder, "opus") == 0) {
 				snprintf(name, sizeof name, "simple_opus_recording%d", i);
@@ -821,7 +821,7 @@ void SimpleOutput::UpdateRecordingAudioSettings()
 	if (flv || strcmp(quality, "Stream") == 0) {
 		obs_encoder_update(audioRecording, settings);
 	} else {
-		for (int i = 0; i < MAX_AUDIO_MIXES; i++) {
+		for (int i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 			if ((tracks & (1 << i)) != 0) {
 				obs_encoder_update(audioTrack[i], settings);
 			}
@@ -1013,7 +1013,7 @@ inline void SimpleOutput::SetupOutputs()
 			if (flv) {
 				obs_encoder_set_audio(audioRecording, obs_get_audio());
 			} else {
-				for (int i = 0; i < MAX_AUDIO_MIXES; i++) {
+				for (int i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 					if ((tracks & (1 << i)) != 0) {
 						obs_encoder_set_audio(audioTrack[i], obs_get_audio());
 					}
@@ -1244,7 +1244,7 @@ void SimpleOutput::UpdateRecording()
 		if (flv || strcmp(quality, "Stream") == 0) {
 			obs_output_set_audio_encoder(fileOutput, audioRecording, 0);
 		} else {
-			for (int i = 0; i < MAX_AUDIO_MIXES; i++) {
+			for (int i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 				if ((tracks & (1 << i)) != 0) {
 					obs_output_set_audio_encoder(fileOutput, audioTrack[i], idx++);
 				}
@@ -1256,7 +1256,7 @@ void SimpleOutput::UpdateRecording()
 		if (flv || strcmp(quality, "Stream") == 0) {
 			obs_output_set_audio_encoder(replayBuffer, audioRecording, 0);
 		} else {
-			for (int i = 0; i < MAX_AUDIO_MIXES; i++) {
+			for (int i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 				if ((tracks & (1 << i)) != 0) {
 					obs_output_set_audio_encoder(replayBuffer, audioTrack[i], idx2++);
 				}
@@ -1576,7 +1576,7 @@ AdvancedOutput::AdvancedOutput(OBSBasic *main_) : BasicOutputHandler(main_)
 	usesBitrate = astrcmpi(rate_control, "CBR") == 0 || astrcmpi(rate_control, "VBR") == 0 ||
 		      astrcmpi(rate_control, "ABR") == 0;
 
-	for (int i = 0; i < MAX_AUDIO_MIXES; i++) {
+	for (int i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 		char name[19];
 		snprintf(name, sizeof(name), "adv_record_audio_%d", i);
 
@@ -1727,7 +1727,7 @@ inline void AdvancedOutput::SetupStreaming()
 	if (!is_multitrack_output) {
 		obs_output_set_audio_encoder(streamOutput, streamAudioEnc, 0);
 	} else {
-		for (int i = 0; i < MAX_AUDIO_MIXES; i++) {
+		for (int i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 			if ((multiTrackAudioMixes & (1 << i)) != 0) {
 				obs_output_set_audio_encoder(streamOutput, streamTrack[i], idx);
 				idx++;
@@ -1796,7 +1796,7 @@ inline void AdvancedOutput::SetupRecording()
 	}
 
 	if (!flv) {
-		for (int i = 0; i < MAX_AUDIO_MIXES; i++) {
+		for (int i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 			if ((tracks & (1 << i)) != 0) {
 				obs_output_set_audio_encoder(fileOutput, recordTrack[i], idx);
 				if (replayBuffer)
@@ -1853,7 +1853,7 @@ inline void AdvancedOutput::SetupFFmpeg()
 
 	OBSDataArrayAutoRelease audio_names = obs_data_array_create();
 
-	for (size_t i = 0; i < MAX_AUDIO_MIXES; i++) {
+	for (size_t i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 		string cfg_name = "Track";
 		cfg_name += to_string((int)i + 1);
 		cfg_name += "Name";
@@ -1916,7 +1916,7 @@ inline void AdvancedOutput::UpdateAudioSettings()
 
 	OBSDataAutoRelease settings[MAX_AUDIO_MIXES];
 
-	for (size_t i = 0; i < MAX_AUDIO_MIXES; i++) {
+	for (size_t i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 		string cfg_name = "Track";
 		cfg_name += to_string((int)i + 1);
 		cfg_name += "Name";
@@ -1928,7 +1928,7 @@ inline void AdvancedOutput::UpdateAudioSettings()
 		SetEncoderName(streamTrack[i], name, def_name.c_str());
 	}
 
-	for (size_t i = 0; i < MAX_AUDIO_MIXES; i++) {
+	for (size_t i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 		int track = (int)(i + 1);
 		settings[i] = obs_data_create();
 		obs_data_set_int(settings[i], "bitrate", GetAudioBitrate(i, recAudioEncoder));
@@ -1963,7 +1963,7 @@ void AdvancedOutput::SetupOutputs()
 	obs_encoder_set_video(videoStreaming, obs_get_video());
 	if (videoRecording)
 		obs_encoder_set_video(videoRecording, obs_get_video());
-	for (size_t i = 0; i < MAX_AUDIO_MIXES; i++) {
+	for (size_t i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 		obs_encoder_set_audio(streamTrack[i], obs_get_audio());
 		obs_encoder_set_audio(recordTrack[i], obs_get_audio());
 	}
@@ -2089,7 +2089,7 @@ std::shared_future<void> AdvancedOutput::SetupStreaming(obs_service_t *service,
 			obs_output_set_audio_encoder(streamOutput, streamAudioEnc, 0);
 		} else {
 			int idx = 0;
-			for (int i = 0; i < MAX_AUDIO_MIXES; i++) {
+			for (int i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 				if ((multiTrackAudioMixes & (1 << i)) != 0) {
 					obs_output_set_audio_encoder(streamOutput, streamTrack[i], idx);
 					idx++;

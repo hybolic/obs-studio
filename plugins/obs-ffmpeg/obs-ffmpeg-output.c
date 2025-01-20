@@ -921,7 +921,7 @@ static inline const char *get_string_or_null(obs_data_t *settings, const char *n
 static int get_audio_mix_count(int audio_mix_mask)
 {
 	int mix_count = 0;
-	for (int i = 0; i < MAX_AUDIO_MIXES; i++) {
+	for (int i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 		if ((audio_mix_mask & (1 << i)) != 0) {
 			mix_count++;
 		}
@@ -1007,7 +1007,7 @@ static bool try_connect(struct ffmpeg_output *output)
 
 	obs_data_array_t *audioNames = obs_data_get_array(settings, "audio_names");
 	if (audioNames) {
-		for (size_t i = 0, idx = 0; i < MAX_AUDIO_MIXES; i++) {
+		for (size_t i = 0, idx = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 			if ((config.audio_tracks & (1 << i)) == 0)
 				continue;
 

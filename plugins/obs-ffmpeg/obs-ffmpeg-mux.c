@@ -334,7 +334,7 @@ inline static void ts_offset_clear(struct ffmpeg_muxer *stream)
 	stream->found_video = false;
 	stream->video_pts_offset = 0;
 
-	for (size_t i = 0; i < MAX_AUDIO_MIXES; i++) {
+	for (size_t i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 		stream->found_audio[i] = false;
 		stream->audio_dts_offsets[i] = 0;
 	}

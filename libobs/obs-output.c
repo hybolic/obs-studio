@@ -235,7 +235,7 @@ static inline void free_packets(struct obs_output *output)
 
 static inline void clear_raw_audio_buffers(obs_output_t *output)
 {
-	for (size_t i = 0; i < MAX_AUDIO_MIXES; i++) {
+	for (size_t i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 		for (size_t j = 0; j < MAX_AV_PLANES; j++) {
 			deque_free(&output->audio_buffer[i][j]);
 		}
@@ -884,7 +884,7 @@ audio_t *obs_output_audio(const obs_output_t *output)
 
 static inline size_t get_first_mixer(const obs_output_t *output)
 {
-	for (size_t i = 0; i < MAX_AUDIO_MIXES; i++) {
+	for (size_t i = 0; i < MODULAR_AUDIO_SOURCES_COUNT; i++) {
 		if ((((size_t)1 << i) & output->mixer_mask) != 0) {
 			return i;
 		}
@@ -2374,7 +2374,7 @@ static inline void start_video_encoders(struct obs_output *output, encoded_callb
 static inline void start_raw_audio(obs_output_t *output)
 {
 	if (output->info.raw_audio2) {
-		for (int idx = 0; idx < MAX_AUDIO_MIXES; idx++) {
+		for (int idx = 0; idx < MODULAR_AUDIO_SOURCES_COUNT; idx++) {
 			if ((output->mixer_mask & ((size_t)1 << idx)) != 0) {
 				audio_output_connect(output->audio, idx, get_audio_conversion(output),
 						     default_raw_audio_callback, output);
@@ -2701,7 +2701,7 @@ static inline void stop_video_encoders(obs_output_t *output, encoded_callback_t 
 static inline void stop_raw_audio(obs_output_t *output)
 {
 	if (output->info.raw_audio2) {
-		for (int idx = 0; idx < MAX_AUDIO_MIXES; idx++) {
+		for (int idx = 0; idx < MODULAR_AUDIO_SOURCES_COUNT; idx++) {
 			if ((output->mixer_mask & ((size_t)1 << idx)) != 0) {
 				audio_output_disconnect(output->audio, idx, default_raw_audio_callback, output);
 			}

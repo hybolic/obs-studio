@@ -2862,7 +2862,6 @@ void OBSBasicSettings::LoadAdvancedSettings()
 	const char *processPriority = config_get_string(App()->GetAppConfig(), "General", "ProcessPriority");
 	bool enableNewSocketLoop = config_get_bool(main->Config(), "Output", "NewSocketLoopEnable");
 	bool enableLowLatencyMode = config_get_bool(main->Config(), "Output", "LowLatencyEnable");
-	uint _count_numOfChannels = config_get_uint(main->Config(), "Output", "NumOfChannels");
 
 	int idx = ui->processPriority->findData(processPriority);
 	if (idx == -1)
@@ -2873,6 +2872,7 @@ void OBSBasicSettings::LoadAdvancedSettings()
 	ui->enableLowLatencyMode->setChecked(enableLowLatencyMode);
 	ui->enableLowLatencyMode->setToolTip(QTStr("Basic.Settings.Advanced.Network.TCPPacing.Tooltip"));
 
+	uint _count_numOfChannels = config_get_uint(main->Config(), "Output", "NumOfChannels");
 	ui->numOfChannels->setValue(_count_numOfChannels);
 #endif
 #if defined(_WIN32) || defined(__APPLE__)

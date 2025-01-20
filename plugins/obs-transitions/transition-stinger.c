@@ -493,7 +493,7 @@ static bool stinger_audio_render(void *data, uint64_t *ts_out, struct obs_source
 	struct obs_source_audio_mix child_audio;
 	obs_source_get_audio_mix(s->media_source, &child_audio);
 
-	for (size_t mix = 0; mix < MAX_AUDIO_MIXES; mix++) {
+	for (size_t mix = 0; mix < MODULAR_AUDIO_SOURCES_COUNT; mix++) {
 		if ((mixers & (1 << mix)) == 0)
 			continue;
 
