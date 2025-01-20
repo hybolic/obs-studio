@@ -555,7 +555,6 @@ void config_set_string(config_t *config, const char *section, const char *name, 
 		value = "";
 	config_set_item(config, &config->sections, section, name, bstrdup(value));
 }
-
 void config_set_int(config_t *config, const char *section, const char *name, int64_t value)
 {
 	struct dstr str;

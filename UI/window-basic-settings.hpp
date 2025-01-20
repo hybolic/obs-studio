@@ -178,10 +178,9 @@ private:
 
 	QPointer<QCheckBox> vodTrackCheckbox;
 	QPointer<QWidget> vodTrackContainer;
-	QPointer<QRadioButton> vodTrack[MAX_AUDIO_MIXES];
+	std::vector<QPointer<QRadioButton>> vodTracks;
 
 	QIcon hotkeyConflictIcon;
-
 	void SaveCombo(QComboBox *widget, const char *section, const char *value);
 	void SaveComboData(QComboBox *widget, const char *section, const char *value);
 	void SaveCheckBox(QAbstractButton *widget, const char *section, const char *value, bool invert = false);
@@ -506,11 +505,73 @@ protected:
 public:
 	OBSBasicSettings(QWidget *parent);
 	~OBSBasicSettings();
-
-	template<typename Widget, typename WidgetParent, typename... SignalArgs, typename... SlotArgs>
-	void ReHookWidget(Widget *widget, void (WidgetParent::*signal)(SignalArgs...), void (OBSBasicSettings::*slot)(SlotArgs...))
-	{
-		HookWidget(widget, signal, slots);
-	}
 	inline const QIcon &GetHotkeyConflictIcon() const { return hotkeyConflictIcon; }
+
+
+
+
+	
+	//template<class T> static std::initializer_list<T *> init_listify(std::vector<QPointer<T>> list);
+	//template<class T> static std::initializer_list<T *> init_listify(T *first_element, std::vector<QPointer<T>> list);
+
+
+	template<class T>
+	static std::initializer_list<T *> init_listify(T first_element, std::vector<QPointer<T>> list)
+	{
+		std::initializer_list<T *> init_list[list.size() + 1];
+		init_list[0] = first_element;
+		for (int count = 0; count < list.size(); count++) {
+			init_list[count + 1] = list[count];
+		}
+	}
+	template<class T>
+	static std::initializer_list<T *> init_listify(std::vector<QPointer<T>> list)
+	{
+		std::initializer_list<T> init_list[list.size()];
+		for (int count = 0; count < list.size(); count++) {
+			init_list[count] = list[count];
+		}
+	}
+
+	void HookAdditionalWidgets()
+	{
+		foreach(QPointer<QCheckBox> simpleOutRecTrack, ui->simpleOutRecTracks)
+		{
+			HookWidget(simpleOutRecTrack.data(), CHECK_CHANGED, OUTPUTS_CHANGED);
+		}
+		foreach(QPointer<QRadioButton> simpleFlvTrack, ui->simpleFlvTracks_list)
+		{
+			HookWidget(simpleFlvTrack.data(), CHECK_CHANGED, OUTPUTS_CHANGED);
+		}
+		foreach(QPointer<QRadioButton> advOutTrack, ui->advOutTracks)
+		{
+			HookWidget(advOutTrack.data(), CHECK_CHANGED, OUTPUTS_CHANGED);
+			connect(advOutTrack.data(), &QCheckBox::toggled, this,
+				&OBSBasicSettings::AdvReplayBufferChanged);
+		}
+		foreach(QPointer<QCheckBox> advOutMultiTrack, ui->advOutMultiTracks)
+		{
+			HookWidget(advOutMultiTrack.data(), CHECK_CHANGED, OUTPUTS_CHANGED);
+		}
+		foreach(QPointer<QCheckBox> advOutRecTrack, ui->advOutRecTracks)
+		{
+			connect(advOutRecTrack.data(), &QCheckBox::clicked, this,
+				&OBSBasicSettings::AdvOutRecCheckWarnings);
+			HookWidget(advOutRecTrack.data(), CHECK_CHANGED, OUTPUTS_CHANGED);
+		}
+		foreach(QPointer<QRadioButton> flvTrack, ui->flvTracks_list)
+		{
+			HookWidget(flvTrack.data(), CHECK_CHANGED, OUTPUTS_CHANGED);
+		}
+		foreach(QPointer<QCheckBox> advOutFFTrack, ui->advOutFFTracks)
+		{
+			HookWidget(advOutFFTrack.data(), CHECK_CHANGED, OUTPUTS_CHANGED);
+		}
+		for (int i = 0; i < ui->advOutTrackBitrates.size(); i++) {
+			HookWidget(ui->advOutTrackBitrates[i].data(), COMBO_CHANGED, OUTPUTS_CHANGED);
+			connect(ui->advOutTrackBitrates[i].data(), &QComboBox::currentIndexChanged, this, &OBSBasicSettings::UpdateStreamDelayEstimate);
+			connect(ui->advOutTrackBitrates[i].data(), &QComboBox::currentIndexChanged, this, &OBSBasicSettings::AdvReplayBufferChanged);
+			HookWidget(ui->advOutTrackNames[i].data(), EDIT_CHANGED, OUTPUTS_CHANGED);
+		}
+	}
 };
